@@ -48,12 +48,15 @@ class ReaderPCSC(ReaderTemplate):
         self.timeoutTimer.timeout.connect(self.timeoutFired)
         self.timeoutTimer.setInterval(2000)
         self.getParams().addChildren([
-            {'name':'Keep-Alive Interval (off=0)', 'type':'int', 'value':2, 'set':self.setKeepalive}
+            {'name':'Keep-Alive Interval (off=0)', 'key': 'keepalive', 'type':'int', 'default':2, 'set':self.setKeepalive, 'get': self.keepalive}
         ])
 
     @setupSetParam("Keep-Alive Interval (off=0)")
     def setKeepalive(self, kinterval):
         self.timeoutTimer.setInterval(kinterval*1000)
+        
+    def keepalive(self):
+		return self.timeoutTimer.getIntervel() // 1000
 
     def timeoutFired(self):
         self.scserv.connection.connect()
