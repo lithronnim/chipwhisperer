@@ -48,7 +48,9 @@ class ReaderPCSC(ReaderTemplate):
         self.timeoutTimer.timeout.connect(self.timeoutFired)
         self.timeoutTimer.setInterval(2000)
         self.getParams().addChildren([
-            {'name':'Keep-Alive Interval (off=0)', 'key': 'keepalive', 'type':'int', 'default':2, 'set':self.setKeepalive, 'get': self.keepalive}
+            {'name':'Keep-Alive Interval (off=0)', 'key': 'keepalive', 'type':'int', 'default':2, 'set':self.setKeepalive, 'get': self.keepalive},
+			{'name':'Answer To Reset (ATR)', 'key':'atr', 'type':'str', 'value':'', 'readonly':True},
+            {'name':'Reset Card', 'type':'action', 'action':self.reset}
         ])
 
     @setupSetParam("Keep-Alive Interval (off=0)")
@@ -111,11 +113,12 @@ class ReaderPCSC(ReaderTemplate):
 
     def reset(self):
         """Reset card & save the ATR"""
-        pass
+        atr = self.scserv.connection.getATR()
+        self.findParam('atr').setValue(toHexString(atr))
 
     def getATR(self):
         """Get the ATR from the SmartCard. Reads a saved value, user reset() to actually reset card."""
-        pass
+        return self.findParam('atr').getValue()
 
     def dis(self):
         self.scserv.connection.disconnect()
